@@ -70,12 +70,12 @@
 </head>
 <body>
     <div id="game-container">
-        <div id="score">Score: 0</div>
+        <div id="score">スコア: 0</div>
         <div class="grid" id="grid"></div>
     </div>
     <div id="game-over">
-        Game Over!
-        <button id="restart-button">Restart</button>
+        ゲームオーバー！
+        <button id="restart-button">再スタート</button>
     </div>
 
     <script>
@@ -86,6 +86,7 @@
         let score = 0;
         let board = [];
 
+        // ゲームを初期化する関数
         function initGame() {
             score = 0;
             board = Array(4).fill().map(() => Array(4).fill(0));
@@ -95,6 +96,7 @@
             gameOverDisplay.style.display = 'none';
         }
 
+        // 新しいタイルを追加する関数
         function addNewTile() {
             let available = [];
             for (let i = 0; i < 4; i++) {
@@ -110,6 +112,7 @@
             }
         }
 
+        // 画面表示を更新する関数
         function updateDisplay() {
             grid.innerHTML = '';
             for (let i = 0; i < 4; i++) {
@@ -123,9 +126,10 @@
                     grid.appendChild(cell);
                 }
             }
-            scoreDisplay.textContent = `Score: ${score}`;
+            scoreDisplay.textContent = `スコア: ${score}`;
         }
 
+        // タイルの色を取得する関数
         function getTileColor(value) {
             const colors = {
                 2: '#eee4da',
@@ -143,6 +147,7 @@
             return colors[value] || '#3c3a32';
         }
 
+        // 移動を処理する関数
         function move(direction) {
             let moved = false;
             let newBoard = JSON.parse(JSON.stringify(board));
@@ -175,6 +180,7 @@
             }
         }
 
+        // 行や列をスライドする関数
         function slide(row) {
             let newRow = row.filter(tile => tile !== 0);
             for (let i = 0; i < newRow.length - 1; i++) {
@@ -190,10 +196,12 @@
             return newRow;
         }
 
+        // 配列が等しいかどうかをチェックする関数
         function arraysEqual(arr1, arr2) {
             return JSON.stringify(arr1) === JSON.stringify(arr2);
         }
 
+        // ゲームオーバーかどうかをチェックする関数
         function isGameOver() {
             // 空のセルがある場合、ゲームオーバーではない
             for (let i = 0; i < 4; i++) {
@@ -218,6 +226,7 @@
             return true;
         }
 
+        // キー押下時の処理を行う関数
         document.addEventListener('keydown', handleKeyPress);
         document.addEventListener('touchstart', handleTouchStart);
         document.addEventListener('touchmove', handleTouchMove);
@@ -226,6 +235,7 @@
         let xDown = null;
         let yDown = null;
 
+        // キー押下時のイベントハンドラ
         function handleKeyPress(e) {
             switch(e.key) {
                 case 'ArrowLeft': move('left'); break;
@@ -235,12 +245,14 @@
             }
         }
 
+        // タッチ開始時のイベントハンドラ
         function handleTouchStart(e) {
             const firstTouch = e.touches[0];
             xDown = firstTouch.clientX;
             yDown = firstTouch.clientY;
         }
 
+        // タッチ移動時のイベントハンドラ
         function handleTouchMove(e) {
             if (!xDown || !yDown) return;
 
@@ -268,7 +280,9 @@
             yDown = null;
         }
 
+        // ゲームを初期化
         initGame();
     </script>
 </body>
 </html>
+
