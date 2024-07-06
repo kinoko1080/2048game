@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2048 ゲーム</title>
     <style>
-        /* スタイルの定義 */
         body {
             font-family: Arial, sans-serif;
             display: flex;
@@ -42,6 +41,31 @@
             font-size: 24px;
             margin-bottom: 10px;
         }
+        #game-over {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(238, 228, 218, 0.73);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            font-weight: bold;
+            display: none;
+        }
+        #restart-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #8f7a66;
+            color: #f9f6f2;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -49,23 +73,28 @@
         <div id="score">Score: 0</div>
         <div class="grid" id="grid"></div>
     </div>
+    <div id="game-over">
+        Game Over!
+        <button id="restart-button">Restart</button>
+    </div>
 
     <script>
-        // ゲーム関連の変数を初期化
         const grid = document.getElementById('grid');
         const scoreDisplay = document.getElementById('score');
+        const gameOverDisplay = document.getElementById('game-over');
+        const restartButton = document.getElementById('restart-button');
         let score = 0;
         let board = [];
 
-        // ゲームを初期化する関数
         function initGame() {
+            score = 0;
             board = Array(4).fill().map(() => Array(4).fill(0));
             addNewTile();
             addNewTile();
             updateDisplay();
+            gameOverDisplay.style.display = 'none';
         }
 
-        // 新しいタイルをランダムな空のセルに追加する関数
         function addNewTile() {
             let available = [];
             for (let i = 0; i < 4; i++) {
@@ -81,7 +110,6 @@
             }
         }
 
-        // ゲーム画面を更新する関数
         function updateDisplay() {
             grid.innerHTML = '';
             for (let i = 0; i < 4; i++) {
@@ -98,7 +126,6 @@
             scoreDisplay.textContent = `Score: ${score}`;
         }
 
-        // タイルの値に応じて色を返す関数
         function getTileColor(value) {
             const colors = {
                 2: '#eee4da',
@@ -116,7 +143,6 @@
             return colors[value] || '#3c3a32';
         }
 
-        // タイルを移動させる関数
         function move(direction) {
             let moved = false;
             let newBoard = JSON.parse(JSON.stringify(board));
@@ -143,10 +169,12 @@
                 board = newBoard;
                 addNewTile();
                 updateDisplay();
+                if (isGameOver()) {
+                    gameOverDisplay.style.display = 'flex';
+                }
             }
         }
 
-        // タイルをスライドさせる関数
         function slide(row) {
             let newRow = row.filter(tile => tile !== 0);
             for (let i = 0; i < newRow.length - 1; i++) {
@@ -162,21 +190,42 @@
             return newRow;
         }
 
-        // 2つの配列が等しいかチェックする関数
         function arraysEqual(arr1, arr2) {
             return JSON.stringify(arr1) === JSON.stringify(arr2);
         }
 
-        // キーボード入力のイベントリスナー
+        function isGameOver() {
+            // 空のセルがある場合、ゲームオーバーではない
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    if (board[i][j] === 0) return false;
+                }
+            }
+
+            // 隣接するセルに同じ値がある場合、ゲームオーバーではない
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    if (
+                        (i < 3 && board[i][j] === board[i + 1][j]) ||
+                        (j < 3 && board[i][j] === board[i][j + 1])
+                    ) {
+                        return false;
+                    }
+                }
+            }
+
+            // 上記の条件に当てはまらない場合、ゲームオーバー
+            return true;
+        }
+
         document.addEventListener('keydown', handleKeyPress);
-        // タッチ操作のイベントリスナー
         document.addEventListener('touchstart', handleTouchStart);
         document.addEventListener('touchmove', handleTouchMove);
+        restartButton.addEventListener('click', initGame);
 
         let xDown = null;
         let yDown = null;
 
-        // キーボード操作を処理する関数
         function handleKeyPress(e) {
             switch(e.key) {
                 case 'ArrowLeft': move('left'); break;
@@ -186,14 +235,12 @@
             }
         }
 
-        // タッチ開始時の処理
         function handleTouchStart(e) {
             const firstTouch = e.touches[0];
             xDown = firstTouch.clientX;
             yDown = firstTouch.clientY;
         }
 
-        // タッチ移動時の処理
         function handleTouchMove(e) {
             if (!xDown || !yDown) return;
 
@@ -221,7 +268,6 @@
             yDown = null;
         }
 
-        // ゲームを初期化
         initGame();
     </script>
 </body>
